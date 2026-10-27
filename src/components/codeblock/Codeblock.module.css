@@ -1,0 +1,73 @@
+.codeContainer {
+  --font: 14px 'Courier New', Courier, monospace;
+  --line-height: 18px;
+
+  display: flex;
+  box-sizing: border-box;
+  width: 600px;
+  height: 400px;
+  border: solid black 1px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.gutter {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-right: 1px solid #ddd;
+  background: #f7f7f7;
+  padding: 1px;
+  user-select: none;
+  padding-top: 1px;
+  & div {
+    min-width: 3ch;
+    height: var(--line-height);
+    font: var(--font);
+    color: #999999;
+    margin: 0;
+    padding: 1px;
+    text-align: right;
+  }
+}
+
+.editable {
+  anchor-name: --code-anchor;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: auto;
+  white-space: pre;
+  tab-size: 2;
+  margin: 0;
+  z-index: 1000;
+  padding-left: 8px;
+  font: var(--font);
+  outline: none;
+  resize: none;
+  border: none;
+  padding-top: 0;
+  overscroll-behavior: none;
+  color: transparent;
+  caret-color: black;
+}
+
+.divTest {
+  position-anchor: --code-anchor;
+  user-select: none;
+  pointer-events: none;
+  font: var(--font);
+  z-index: 1001;
+  position: absolute;
+  outline: none;
+  resize: none;
+  border: none;
+  inset: anchor(top) anchor(right) anchor(bottom) anchor(left);
+  box-sizing: border-box;
+  white-space: pre;
+  padding: 1px 20px 20px 8px;
+  margin: 0;
+  color: red;
+  overflow: hidden;
+}
