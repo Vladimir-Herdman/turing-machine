@@ -1,3 +1,24 @@
+.body {
+  width: 100%;
+  height: 90vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.visuals {
+  display: flex;
+  flex-direction: row;
+}
+
+.graph {
+  flex: 1;
+}
+
+/* .slider { */
+/*   --null: "null" */
+/* } */
+
 .code {
-  margin-left: 20px;
+  --null: "null";
 }

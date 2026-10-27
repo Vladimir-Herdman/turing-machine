@@ -1,15 +1,23 @@
 .code {
-  --font: 14px 'Courier New', Courier, monospace;
   --line-height: 18px;
 
   display: flex;
+  flex-direction: row-reverse;
   box-sizing: border-box;
   width: 750px;
-  height: 400px;
+  height: 700px;
   border: solid black 1px;
   border-radius: 5px;
   overflow: hidden;
   position: relative;
+
+  /* TODO: Make, instead, a resizable bar in the middle rather than this (which just works already, but could be nicer.) */
+  resize: horizontal;
+  direction: rtl;
+  /* direction's changed so resize handle on left of box, but children still ltr for English users. */
+  & > * {
+      direction: ltr;
+  }
 }
 
 .lineNumbers {
@@ -24,7 +32,7 @@
   & div {
     min-width: 3ch;
     height: var(--line-height);
-    font: var(--font);
+    font: var(--codefont);
     color: #999999;
     margin: 0;
     padding: 1px;
@@ -43,7 +51,7 @@
   margin: 0;
   z-index: 1000;
   padding-left: 8px;
-  font: var(--font);
+  font: var(--codefont);
   outline: none;
   resize: none;
   border: none;
@@ -58,7 +66,7 @@
   position-anchor: --code-anchor;
   user-select: none;
   pointer-events: none;
-  font: var(--font);
+  font: var(--codefont);
   z-index: 1001;
   position: absolute;
   outline: none;
@@ -74,7 +82,9 @@
   & > .comment {
     color: #226e24;
   }
-
+  & > .input {
+    font-weight: bold;
+  }
   & > .plain {
     color: black;
   }
@@ -87,8 +97,13 @@
   z-index: 1001;
   width: fit-content;
   height: fit-content;
-  font: var(--font);
+  font: var(--codefont);
   border: 1px solid #ddd;
   background: #f7f7f7;
   padding: 2px;
+}
+
+.red {
+  color: red !important;
+  background-color: yellow;
 }

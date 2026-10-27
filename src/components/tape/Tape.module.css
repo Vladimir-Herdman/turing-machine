@@ -1,0 +1,11 @@
+.tape {
+  width: 100%;
+  border: solid black 1px;
+  text-align: center;
+}
+
+.cell {
+  padding: 2px;
+  font: (--codefont);
+  font-size: 32px;
+}
