@@ -1,17 +1,18 @@
-.codeContainer {
+.code {
   --font: 14px 'Courier New', Courier, monospace;
   --line-height: 18px;
 
   display: flex;
   box-sizing: border-box;
-  width: 600px;
+  width: 750px;
   height: 400px;
   border: solid black 1px;
   border-radius: 5px;
   overflow: hidden;
+  position: relative;
 }
 
-.gutter {
+.lineNumbers {
   flex-shrink: 0;
   box-sizing: border-box;
   overflow: hidden;
@@ -39,7 +40,6 @@
   box-sizing: border-box;
   overflow: auto;
   white-space: pre;
-  tab-size: 2;
   margin: 0;
   z-index: 1000;
   padding-left: 8px;
@@ -50,10 +50,11 @@
   padding-top: 0;
   overscroll-behavior: none;
   color: transparent;
-  caret-color: black;
+  caret-color: color-mix(in srgb, black 45%, transparent);
+  caret-shape: block;
 }
 
-.divTest {
+.overlayText {
   position-anchor: --code-anchor;
   user-select: none;
   pointer-events: none;
@@ -68,6 +69,26 @@
   white-space: pre;
   padding: 1px 20px 20px 8px;
   margin: 0;
-  color: red;
   overflow: hidden;
+
+  & > .comment {
+    color: #226e24;
+  }
+
+  & > .plain {
+    color: black;
+  }
+}
+
+.infoBox {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 1001;
+  width: fit-content;
+  height: fit-content;
+  font: var(--font);
+  border: 1px solid #ddd;
+  background: #f7f7f7;
+  padding: 2px;
 }
