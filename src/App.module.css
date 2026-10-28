@@ -1,6 +1,8 @@
 .body {
+  --bodyheight: 90vh;
+
   width: 100%;
-  height: 90vh;
+  height: var(--bodyheight);
   position: relative;
   display: flex;
   flex-direction: column;

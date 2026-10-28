@@ -1,11 +1,62 @@
 .tape {
-  width: 100%;
+  width: 100vw;
   border: solid black 1px;
   text-align: center;
+  position: relative;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  z-index: 1000;
+
+  &:after {
+    content: 'Tape';
+    width: fit-content;
+    height: fit-content;
+    padding: 3px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    z-index: 1001;
+    border: solid black 1px;
+    background-color: lightgrey;
+  }
+}
+
+.controls {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+
+  & > button {
+    padding: 10px;
+  }
+  & > input {
+    width: 200px;
+    position: relative;
+
+    &:after {
+      content: 'Run Speed';
+      width: 100%;
+      position: absolute;
+      top: -15px;
+      left: 0;
+    }
+  }
 }
 
 .cell {
   padding: 2px;
   font: (--codefont);
   font-size: 32px;
+  position: relative;
+}
+
+.head {
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-55%);
 }

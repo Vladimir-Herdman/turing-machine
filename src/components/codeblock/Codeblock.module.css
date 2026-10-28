@@ -5,7 +5,7 @@
   flex-direction: row-reverse;
   box-sizing: border-box;
   width: 750px;
-  height: 700px;
+  height: calc(var(--bodyheight) - 15vh);
   border: solid black 1px;
   border-radius: 5px;
   overflow: hidden;
