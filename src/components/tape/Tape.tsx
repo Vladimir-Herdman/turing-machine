@@ -1,8 +1,11 @@
 import type { Dispatch, SetStateAction } from 'react';
 import styles from './Tape.module.css'
 
+type MachineDict = Record<string, Record<string, StateMachine>>;
 export type TapeState = {
   curState?: string;
+  machineDict?: MachineDict;
+  startState?: string;
   runSpeed: number;
   input: string;
   headIndex: number;
@@ -15,7 +18,6 @@ type StateMachine = {
   newState: string;
   direction: string;
 };
-type MachineDict = Record<string, Record<string, StateMachine>>;
 
 type SetTapeState = Dispatch<SetStateAction<TapeState>>;
 type Props = {
@@ -39,7 +41,7 @@ export default function Tape({ state, setState}: Props) {
       </div>
 
       <div className={styles.controls}>
-        <button onClick={() => loadCodeIntoStateMachine(state, setState)}>Load Program</button>
+        <button onClick={() => loadCodeIntoStateMachine(state)}>Load Program</button>
         <button onClick={() => step(state, setState)}>Step</button>
         <button>Run</button>
         <button onClick={() => console.log("TODO - set Reset button method.")}>Reset</button>
@@ -50,15 +52,23 @@ export default function Tape({ state, setState}: Props) {
 }
 
 function step(state: TapeState, setState: SetTapeState) {
-  const [stateMachineDict, startState] = loadCodeIntoStateMachine(state);
-  //TODO: Check if {} is falsy here?
-  if (!stateMachineDict || !startState) {
+  if (!state.machineDict) {
+    const [stateMachineDict, startState] = loadCodeIntoStateMachine(state);
+    setState(s => ({...s,
+      startState:startState,
+      curState:startState,
+      machineDict:stateMachineDict
+    }));
+  }
+  console.log(state);
+  return;
+  if (!state.machineDict || !state.startState || !state.curState) {
     console.error("TODO - do something here, like throw an error? Input not in state list?");
     return
   }
 
   const cursymbol = state.input[state.headIndex];
-  const step = stateMachineDict[startState][cursymbol];
+  const step = state.machineDict[state.curState][cursymbol];
   if (!step) {
     console.error("TODO - do something here, like throw an error? Input not in state list?");
   }
@@ -67,7 +77,7 @@ function step(state: TapeState, setState: SetTapeState) {
   let newInput: string[], newHeadIndex: number=state.headIndex;
 
   newInput = state.input.split("");
-  newInput[state.headIndex] = "a";
+  newInput[state.headIndex] = newSymbol;
 
   if (direction === "r") {
     newHeadIndex += 1;
@@ -78,7 +88,6 @@ function step(state: TapeState, setState: SetTapeState) {
     return;
   }
 
-  console.log("curstate", startState)
   setState(s => ({...s,
     input:newInput.join(""),
     headIndex:newHeadIndex,
