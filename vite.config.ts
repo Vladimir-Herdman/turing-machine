@@ -10,4 +10,5 @@ export default defineConfig({
             presets: [reactCompilerPreset()]
         }),
     ],
+    base: '/turing-machine/'
 })
