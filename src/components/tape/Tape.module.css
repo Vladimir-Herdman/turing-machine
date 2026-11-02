@@ -52,6 +52,11 @@
   font: (--codefont);
   font-size: 32px;
   position: relative;
+  white-space: pre;
+
+  &.active {
+    border: solid black 1px;
+  }
 }
 
 .head {

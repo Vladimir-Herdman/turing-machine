@@ -14,6 +14,8 @@ function App() {
     input:initialCodeExample.match(/[10]+/)![0],
     headIndex:0,
     code:codeRef,
+    machineDict: {},
+    curState: "",
   });
 
   const onCodeUpdate = (code: string, input: string) => {

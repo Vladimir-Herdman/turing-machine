@@ -3,9 +3,8 @@ import styles from './Tape.module.css'
 
 type MachineDict = Record<string, Record<string, StateMachine>>;
 export type TapeState = {
-  curState?: string;
-  machineDict?: MachineDict;
-  startState?: string;
+  curState: string;
+  machineDict: MachineDict;
   runSpeed: number;
   input: string;
   headIndex: number;
@@ -33,7 +32,7 @@ export default function Tape({ state, setState}: Props) {
         {[...state.input].map((ch, i) => (
           <span
           key={i}
-          className={styles.cell}>
+          className={`${styles.cell} ${i === state.headIndex ? styles.active : ""}`}>
           {ch}
           {i === state.headIndex && (<span className={styles.head}>^</span>)}
           </span>
@@ -44,37 +43,45 @@ export default function Tape({ state, setState}: Props) {
         <button onClick={() => loadCodeIntoStateMachine(state)}>Load Program</button>
         <button onClick={() => step(state, setState)}>Step</button>
         <button>Run</button>
-        <button onClick={() => console.log("TODO - set Reset button method.")}>Reset</button>
+        <button onClick={() => reset()}>Reset</button>
         <input type="range" min="1" max="100" onChange={(v) => setState(s => ({...s, runSpeed:Number(v.target.value)}))} />
       </div>
     </div>
   );
 }
 
+function isEmptyObj(o: any): Boolean {
+  return Object.keys(o).length === 0;
+}
+
 function step(state: TapeState, setState: SetTapeState) {
-  if (!state.machineDict) {
-    const [stateMachineDict, startState] = loadCodeIntoStateMachine(state);
-    setState(s => ({...s,
-      startState:startState,
-      curState:startState,
-      machineDict:stateMachineDict
-    }));
+  let machineDict: MachineDict = state.machineDict;
+  let curState: string = state.curState;
+  if (isEmptyObj(machineDict))
+    [machineDict, curState] = loadCodeIntoStateMachine(state);
+  if (isEmptyObj(machineDict) || curState === "") {
+    console.error("TODO - error reason here.");
+    return;
   }
-  console.log(state);
-  return;
-  if (!state.machineDict || !state.startState || !state.curState) {
-    console.error("TODO - do something here, like throw an error? Input not in state list?");
-    return
+
+  if (curState === "halt") {
+    console.log("TODO - Insert halt/done logic here.");
+    return;
   }
 
   const cursymbol = state.input[state.headIndex];
-  const step = state.machineDict[state.curState][cursymbol];
+  const step = machineDict[curState][cursymbol];
   if (!step) {
-    console.error("TODO - do something here, like throw an error? Input not in state list?");
+    console.error(`No rule found for input '${cursymbol}' in state '${curState}'.`);
+    return;
   }
 
-  const {instructionline, newSymbol, newState, direction} = step;
+  let {instructionline, newSymbol, newState, direction} = step;
+  if (newSymbol === "_")
+    newSymbol = " ";
+
   let newInput: string[], newHeadIndex: number=state.headIndex;
+  console.log("TODO - use instructionline somewhere for highlighting:", instructionline)
 
   newInput = state.input.split("");
   newInput[state.headIndex] = newSymbol;
@@ -88,11 +95,23 @@ function step(state: TapeState, setState: SetTapeState) {
     return;
   }
 
+  if (newHeadIndex >= newInput.length)
+    newInput = [...newInput, " "];
+  if (newHeadIndex <= state.headIndex && newHeadIndex <= 0) {
+    newHeadIndex = 0;
+    newInput = [" ", ...newInput];
+  }
+
   setState(s => ({...s,
     input:newInput.join(""),
     headIndex:newHeadIndex,
     curState:newState,
+    machineDict:machineDict,
   }));
+}
+
+function reset() {
+  console.error("TODO - Make reset work properly.");
 }
 
 //In my head, this dict call will be take input one character at a time and the
@@ -101,23 +120,27 @@ function step(state: TapeState, setState: SetTapeState) {
 //a '0' or a '1'. so call dict[state][input-char], which gets <direction,
 //replacement character, newstate>.
 const instructionPat = /([a-zA-Z0-9_]+) ([a-zA-Z0-9_]) ([a-zA-Z0-9_]) ([lr\*]) ([a-zA-Z0-9_]+)/;
-function loadCodeIntoStateMachine(state: TapeState): [machineDict: MachineDict, startState: string | undefined] {
+function loadCodeIntoStateMachine(state: TapeState): [machineDict: MachineDict, startState: string] {
   if (!state.code.current || state.code.current === "") {
     console.error("No code that can currently be loaded into state machine.");
-    return [{}, undefined];
+    return [{}, ""];
   }
 
   const lines: string[] = state.code.current.split("\n");
   let stateMachineDict: Record<string, Record<string, StateMachine>> = {};
-  let startState: string | undefined;
+  let startState: string = "";
 
   for (let i=0; i<lines.length; i++) {
     const match = lines[i].match(instructionPat);
     if (!match)
       continue;
-    const [, curstate, cursymbol, newsymbol, direction, newstate] = match;
+    let [, curstate, cursymbol, newsymbol, direction, newstate] = match;
 
-    startState ??= curstate;
+    if (startState === "")
+      startState = curstate;
+    if (cursymbol === "_")
+      cursymbol = " ";
+
     (stateMachineDict[curstate] ??= {})[cursymbol] = {
       instructionline: i+1,
       newSymbol: newsymbol,
