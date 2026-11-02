@@ -48,8 +48,8 @@
 }
 
 .cell {
-  padding: 2px;
-  font: (--codefont);
+  padding: 1px;
+  font: var(--codefont);
   font-size: 32px;
   position: relative;
   white-space: pre;
