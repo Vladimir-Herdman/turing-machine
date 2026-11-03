@@ -20,47 +20,27 @@
   }
 }
 
-.prevLine {
+.lineHighlight {
   --line: -1;
+  --color: red;
+  --content: 'current';
+  --right-shift: 40px;
 
   width: 100%;
   height: var(--line-height);
-  background-color: color-mix(in srgb, blue 30%, transparent);
+  background-color: color-mix(in srgb, var(--color) 30%, transparent);
   position: absolute;
   top: var(--line);
   left: 4ch;
   z-index: 1001;
 
   &:after {
-    content: 'prev';
+    content: var(--content);
+    font-weight: bold;
     height: fit-content;
-    background-color: color-mix(in srgb, blue 15%, transparent);
-    border: solid blue 1px;
     position: absolute;
     top: -1px;
-    right: 40px;
-  }
-}
-
-.nextLine {
-  --line: -1;
-
-  width: 100%;
-  height: var(--line-height);
-  background-color: color-mix(in srgb, red 30%, transparent);
-  position: absolute;
-  top: var(--line);
-  left: 4ch;
-  z-index: 1001;
-
-  &:after {
-    content: 'current';
-    height: fit-content;
-    background-color: color-mix(in srgb, red 15%, transparent);
-    border: solid red 1px;
-    position: absolute;
-    top: -1px;
-    right: 40px;
+    right: var(--right-shift);
   }
 }
 

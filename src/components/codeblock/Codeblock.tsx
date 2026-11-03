@@ -76,9 +76,23 @@ export default function Codeblock({tapeState, initialVal=initialCodeExample, onC
       <div className={styles.lineNumbers} ref={lineNumbersRef}>
         {getLineNumbers(code)}
       </div>
-      <div className={styles.infoBox}>errors:{errorCount}, row:{cursorRow}, col:{cursorCol}, nextline:{tapeState.nextLine}</div>
-      {tapeState.curLine >= 0 && <div className={styles.prevLine} style={{"--line": `${curScrollTop}px`} as React.CSSProperties}></div>}
-      {tapeState.nextLine >= 0 && <div className={styles.nextLine} style={{"--line": `${nextScrollTop}px`} as React.CSSProperties}></div>}
+      <div className={styles.infoBox}>errors:{errorCount}, row:{cursorRow}, col:{cursorCol}</div>
+      {tapeState.curLine >= 0 && <div
+        className={styles.lineHighlight}
+        style={{
+          "--line": `${curScrollTop}px`,
+          "--color": "blue",
+          "--content": "'prev'",
+          "--right-shift": "40px"} as React.CSSProperties}>
+      </div>}
+      {tapeState.nextLine >= 0 && <div
+        className={styles.lineHighlight}
+        style={{
+          "--line": `${nextScrollTop}px`,
+          "--color": "red",
+          "--content": "'current'",
+          "--right-shift": "80px"} as React.CSSProperties}>
+      </div>}
 
       <pre
         ref={preRef}
