@@ -18,6 +18,7 @@ export default function Codeblock({tapeState, initialVal=initialCodeExample, onC
   const [code, setCode] = useState(initialVal);
   const [caret, setCaret] = useState(initialVal.length); // offset into the string
   const [curScrollTop, setCurScrollTop] = useState(0);
+  const [nextScrollTop, setNextScrollTop] = useState(0);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
 
@@ -36,6 +37,7 @@ export default function Codeblock({tapeState, initialVal=initialCodeExample, onC
 
   useEffect(() => {
     setCurScrollTop(tapeState.curLine * 18 + 1 - (lineNumbersRef.current?.scrollTop ?? 0));
+    setNextScrollTop(tapeState.nextLine * 18 + 1 - (lineNumbersRef.current?.scrollTop ?? 0));
   }, [tapeState]);
 
   const syncCaret = (e: React.SyntheticEvent<HTMLTextAreaElement>) =>
@@ -44,6 +46,7 @@ export default function Codeblock({tapeState, initialVal=initialCodeExample, onC
   const handleScroll = (e: any) => {
     const { scrollTop, scrollLeft } = e.currentTarget;
     setCurScrollTop(tapeState.curLine * 18 + 1 - scrollTop);
+    setNextScrollTop(tapeState.nextLine * 18 + 1 - scrollTop);
 
     if (lineNumbersRef.current) {
       lineNumbersRef.current.scrollTop = scrollTop;
@@ -73,8 +76,9 @@ export default function Codeblock({tapeState, initialVal=initialCodeExample, onC
       <div className={styles.lineNumbers} ref={lineNumbersRef}>
         {getLineNumbers(code)}
       </div>
-      <div className={styles.infoBox}>errors:{errorCount}, row:{cursorRow}, col:{cursorCol}</div>
-      {tapeState.curLine >= 0 && <div className={styles.executingLine} style={{"--line": `${curScrollTop}px`} as React.CSSProperties}></div>}
+      <div className={styles.infoBox}>errors:{errorCount}, row:{cursorRow}, col:{cursorCol}, nextline:{tapeState.nextLine}</div>
+      {tapeState.curLine >= 0 && <div className={styles.prevLine} style={{"--line": `${curScrollTop}px`} as React.CSSProperties}></div>}
+      {tapeState.nextLine >= 0 && <div className={styles.nextLine} style={{"--line": `${nextScrollTop}px`} as React.CSSProperties}></div>}
 
       <pre
         ref={preRef}

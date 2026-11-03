@@ -5,6 +5,7 @@ type MachineDict = Record<string, Record<string, StateMachine>>;
 export type TapeState = {
   curState: string;
   curLine: number;
+  nextLine: number;
   machineDict: MachineDict;
   runSpeed: number;
   run: boolean;
@@ -62,7 +63,7 @@ function isEmptyObj(o: any): boolean {
   return Object.keys(o).length === 0;
 }
 
-function step(state: TapeState, setState: SetTapeState): TapeState { //false if stop execution.
+function step(state: TapeState, setState: SetTapeState, updateState=true): TapeState { //false if stop execution.
   let machineDict: MachineDict = state.machineDict;
   let curState: string = state.curState;
   if (isEmptyObj(machineDict))
@@ -78,13 +79,13 @@ function step(state: TapeState, setState: SetTapeState): TapeState { //false if 
   }
 
   const cursymbol = state.input[state.headIndex];
-  const step = machineDict[curState][cursymbol];
-  if (!step) {
+  const curstep = machineDict[curState][cursymbol];
+  if (!curstep) {
     console.error(`No rule found for input '${cursymbol}' in state '${curState}'.`);
     return {} as TapeState;
   }
 
-  let {instructionline, newSymbol, newState, direction} = step;
+  let {instructionline, newSymbol, newState, direction} = curstep;
   if (newSymbol === "_")
     newSymbol = " ";
 
@@ -109,7 +110,7 @@ function step(state: TapeState, setState: SetTapeState): TapeState { //false if 
     newInput = [" ", ...newInput];
   }
 
-  const newTapeState = {...state,
+  let newTapeState = {...state,
     input:newInput.join(""),
     headIndex:newHeadIndex,
     curState:newState,
@@ -117,7 +118,14 @@ function step(state: TapeState, setState: SetTapeState): TapeState { //false if 
     curLine:instructionline-1,
     isCodeDisabled:true,
   }
-  setState(newTapeState);
+
+  const nextTapeState = step(newTapeState, setState, false);
+  newTapeState = {...newTapeState,
+    nextLine:nextTapeState.curLine,
+  };
+
+  if (updateState)
+    setState(newTapeState);
 
   return newTapeState;
 }
@@ -134,6 +142,7 @@ function reset(state: TapeState, setState: SetTapeState) {
     machineDict:{},
     curState:"",
     curLine:-1,
+    nextLine:-1,
     isCodeDisabled:false,
   })
 }

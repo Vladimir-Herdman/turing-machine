@@ -18,6 +18,7 @@ function App() {
     machineDict: {},
     curState: "",
     curLine: -1,
+    nextLine: -1,
     isCodeDisabled:false,
   });
 
