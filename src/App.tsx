@@ -10,12 +10,15 @@ import type { TapeState } from './components/tape/Tape'
 function App() {
   const codeRef = useRef("");
   const [tapeState, setTapeState] = useState<TapeState>({
-    runSpeed:0,
-    input:initialCodeExample.match(/[10]+/)![0],
+    runSpeed:50,
+    run: false,
+    input:initialCodeExample.match(/input:[ ]*([01]+)/)![1],
     headIndex:0,
     code:codeRef,
     machineDict: {},
     curState: "",
+    curLine: -1,
+    isCodeDisabled:false,
   });
 
   const onCodeUpdate = (code: string, input: string) => {
@@ -32,7 +35,7 @@ function App() {
         <Tape state={tapeState} setState={setTapeState} />
         <div className={styles.visuals}>
           <div className={styles.graph}></div>
-          <div className={styles.code}><Codeblock onChange={onCodeUpdate} /></div>
+          <div className={styles.code}><Codeblock tapeState={tapeState} onChange={onCodeUpdate} /></div>
         </div>
       </div>
     </>

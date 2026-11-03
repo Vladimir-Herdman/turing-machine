@@ -4,11 +4,14 @@ import styles from './Tape.module.css'
 type MachineDict = Record<string, Record<string, StateMachine>>;
 export type TapeState = {
   curState: string;
+  curLine: number;
   machineDict: MachineDict;
   runSpeed: number;
+  run: boolean;
   input: string;
   headIndex: number;
   code: React.RefObject<string>;
+  isCodeDisabled: boolean;
 };
 
 type StateMachine = {
@@ -26,6 +29,12 @@ type Props = {
 
 export default function Tape({ state, setState}: Props) {
 
+  if (state.run && !state.curState.match(/.*halt.*/)) {
+    setTimeout(() => {
+      step(state, setState);
+    }, Math.abs(state.runSpeed-100)*10);
+  }
+
   return (
     <div className={styles.tape}>
       <div>
@@ -40,40 +49,39 @@ export default function Tape({ state, setState}: Props) {
       </div>
 
       <div className={styles.controls}>
-        <button onClick={() => loadCodeIntoStateMachine(state)}>Load Program</button>
         <button onClick={() => step(state, setState)}>Step</button>
-        <button>Run</button>
-        <button onClick={() => reset()}>Reset</button>
+        <button onClick={() => run(state, setState)}>Run</button>
+        <button onClick={() => reset(state, setState)}>Reset</button>
         <input type="range" min="1" max="100" onChange={(v) => setState(s => ({...s, runSpeed:Number(v.target.value)}))} />
       </div>
     </div>
   );
 }
 
-function isEmptyObj(o: any): Boolean {
+function isEmptyObj(o: any): boolean {
   return Object.keys(o).length === 0;
 }
 
-function step(state: TapeState, setState: SetTapeState) {
+function step(state: TapeState, setState: SetTapeState): TapeState { //false if stop execution.
   let machineDict: MachineDict = state.machineDict;
   let curState: string = state.curState;
   if (isEmptyObj(machineDict))
     [machineDict, curState] = loadCodeIntoStateMachine(state);
   if (isEmptyObj(machineDict) || curState === "") {
     console.error("TODO - error reason here.");
-    return;
+    return {} as TapeState;
   }
 
-  if (curState === "halt") {
+  if (curState.match(/.*halt.*/)) {
     console.log("TODO - Insert halt/done logic here.");
-    return;
+    return {} as TapeState;
   }
 
   const cursymbol = state.input[state.headIndex];
   const step = machineDict[curState][cursymbol];
   if (!step) {
     console.error(`No rule found for input '${cursymbol}' in state '${curState}'.`);
-    return;
+    return {} as TapeState;
   }
 
   let {instructionline, newSymbol, newState, direction} = step;
@@ -81,7 +89,6 @@ function step(state: TapeState, setState: SetTapeState) {
     newSymbol = " ";
 
   let newInput: string[], newHeadIndex: number=state.headIndex;
-  console.log("TODO - use instructionline somewhere for highlighting:", instructionline)
 
   newInput = state.input.split("");
   newInput[state.headIndex] = newSymbol;
@@ -92,7 +99,7 @@ function step(state: TapeState, setState: SetTapeState) {
     newHeadIndex -= 1;
   } else if (direction !== "*") {
     console.error("TODO - error here on wrong symbol?")
-    return;
+    return {} as TapeState;
   }
 
   if (newHeadIndex >= newInput.length)
@@ -102,16 +109,33 @@ function step(state: TapeState, setState: SetTapeState) {
     newInput = [" ", ...newInput];
   }
 
-  setState(s => ({...s,
+  const newTapeState = {...state,
     input:newInput.join(""),
     headIndex:newHeadIndex,
     curState:newState,
     machineDict:machineDict,
-  }));
+    curLine:instructionline-1,
+    isCodeDisabled:true,
+  }
+  setState(newTapeState);
+
+  return newTapeState;
 }
 
-function reset() {
-  console.error("TODO - Make reset work properly.");
+function run(state: TapeState, setState: SetTapeState) {
+  setState({...state, run:true, isCodeDisabled:true});
+}
+
+function reset(state: TapeState, setState: SetTapeState) {
+  setState({...state,
+    run:false,
+    input:state.code.current.match(/input:[ ]*([01]+)/)![1],
+    headIndex:0,
+    machineDict:{},
+    curState:"",
+    curLine:-1,
+    isCodeDisabled:false,
+  })
 }
 
 //In my head, this dict call will be take input one character at a time and the

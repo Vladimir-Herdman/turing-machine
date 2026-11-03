@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { initialCodeExample } from './examples-strings';
 import styles from './Codeblock.module.css'
+import type { TapeState } from '../tape/Tape';
 
 type Props = {
+  tapeState: TapeState;
   initialVal?: string;
   onChange: (codeText: string, input: string) => void;
 };
@@ -12,9 +14,10 @@ const inputPat = /input:[ ]*([01]+)/;
 const errorPat = /(.+ .+ .+ [lr\*] .+)|([a-z]+:[ ]*[a-z0-1]+)/
 let errorCount = 0;
 
-export default function Codeblock({initialVal=initialCodeExample, onChange}: Props) {
+export default function Codeblock({tapeState, initialVal=initialCodeExample, onChange}: Props) {
   const [code, setCode] = useState(initialVal);
   const [caret, setCaret] = useState(initialVal.length); // offset into the string
+  const [curScrollTop, setCurScrollTop] = useState(0);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
 
@@ -31,14 +34,20 @@ export default function Codeblock({initialVal=initialCodeExample, onChange}: Pro
     update(initialCodeExample);
   }, []);
 
+  useEffect(() => {
+    setCurScrollTop(tapeState.curLine * 18 + 1 - (lineNumbersRef.current?.scrollTop ?? 0));
+  }, [tapeState]);
+
   const syncCaret = (e: React.SyntheticEvent<HTMLTextAreaElement>) =>
     setCaret(e.currentTarget.selectionStart);
 
   const handleScroll = (e: any) => {
     const { scrollTop, scrollLeft } = e.currentTarget;
+    setCurScrollTop(tapeState.curLine * 18 + 1 - scrollTop);
 
-    if (lineNumbersRef.current)
+    if (lineNumbersRef.current) {
       lineNumbersRef.current.scrollTop = scrollTop;
+    }
     if (preRef.current) {
       preRef.current.scrollTop = scrollTop;
       preRef.current.scrollLeft = scrollLeft;
@@ -50,6 +59,7 @@ export default function Codeblock({initialVal=initialCodeExample, onChange}: Pro
       e.preventDefault();
       insertAtCursor(e, code, update, "  ", 2);
     }
+    console.log("here");
   };
 
   const coloredCode: any = splitByTokens(code);
@@ -64,6 +74,7 @@ export default function Codeblock({initialVal=initialCodeExample, onChange}: Pro
         {getLineNumbers(code)}
       </div>
       <div className={styles.infoBox}>errors:{errorCount}, row:{cursorRow}, col:{cursorCol}</div>
+      {tapeState.curLine >= 0 && <div className={styles.executingLine} style={{"--line": `${curScrollTop}px`} as React.CSSProperties}></div>}
 
       <pre
         ref={preRef}
@@ -84,6 +95,7 @@ export default function Codeblock({initialVal=initialCodeExample, onChange}: Pro
         onChange={(e) => update(e.target.value, e.target.selectionStart)}
         onSelect={syncCaret}
         onScroll={handleScroll}
+        disabled={tapeState.isCodeDisabled}
         onKeyDown={handleKeyDown}
         spellCheck={false}
         wrap="off"
@@ -162,6 +174,7 @@ function getLineNumbers(codeText: string) {
 
     if (error)
       errorCount += 1;
+
     return (<div className={error ? styles.red : ""} key={i+1}>{i+1}</div>);
   });
 }

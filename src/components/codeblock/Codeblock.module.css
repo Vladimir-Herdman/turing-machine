@@ -20,10 +20,34 @@
   }
 }
 
+.executingLine {
+  --line: -1;
+
+  width: 100%;
+  height: var(--line-height);
+  background-color: color-mix(in srgb, blue 30%, transparent);
+  position: absolute;
+  top: var(--line);
+  left: 4ch;
+  z-index: 1001;
+
+  &:after {
+    content: 'prev';
+    height: fit-content;
+    background-color: color-mix(in srgb, blue 15%, transparent);
+    border: solid blue 1px;
+    position: absolute;
+    top: -1px;
+    right: 40px;
+  }
+}
+
 .lineNumbers {
   flex-shrink: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: visible;
+  z-index: 1001;
   border-right: 1px solid #ddd;
   background: #f7f7f7;
   padding: 1px;

@@ -1,8 +1,9 @@
 export const initialCodeExample = `//INITIAL PROGRAM INTRO
 //The following is just a base example to check if an input has an even/odd
-//number of 1s in it. The machine will 'halt' once it's reached the end of
-//input instructions for a state on an input (so, once there's no more moves).
-//Tape (at end) will be 0 if even, and 1 if odd.
+//number of 1s in it. The machine will 'halt' once it's reached a state with
+//'halt' anywhere in the state name, or there are no more moves for an input
+//and state.
+//The tape will end up being 0 if even, and 1 if odd.
 
 //Hit the 'examples' dropdown in the corner to see some more example programs.
 
