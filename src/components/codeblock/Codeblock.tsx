@@ -10,7 +10,7 @@ type Props = {
 };
 
 const commentPat = /(\/\/.*)/;
-const inputPat = /input:[ ]*([01]+)/;
+const inputPat = /input:[ ]*([a-zA-Z0-9-]+)/;
 const errorPat = /(.+ .+ .+ [lr\*] .+)|([a-z]+:[ ]*[a-z0-1]+)/
 let errorCount = 0;
 
@@ -147,10 +147,12 @@ function splitByTokens(text: string) {
 
     if (plain) {
       if (!inputSet && plain.match(inputPat)) {
-        const [a, b, c] = plain.split(/([10]+)/);
-        tokens.push({text: a, token: "plain"});
-        tokens.push({text: b, token: "input"});
-        tokens.push({text: c, token: "plain"});
+        plain.split(/([a-zA-Z0-9-]+)/).map((str, i) => {
+          if (i === 3)
+            tokens.push({text: str, token: "input"})
+          else
+            tokens.push({text: str, token: "plain"})
+        });
         inputSet = true;
       } else {
         tokens.push({text: plain, token: "plain"});

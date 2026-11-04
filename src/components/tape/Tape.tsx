@@ -4,6 +4,7 @@ import styles from './Tape.module.css'
 type MachineDict = Record<string, Record<string, StateMachine>>;
 export type TapeState = {
   curState: string;
+  showCurState: string;
   curLine: number;
   nextLine: number;
   machineDict: MachineDict;
@@ -43,10 +44,14 @@ export default function Tape({ state, setState}: Props) {
     return () => clearTimeout(id);
   }, [state]);
 
+  let input = [...state.input];
+  if (input.length === 0)
+    input = [" "];
+
   return (
     <div className={styles.tape}>
       <div>
-        {[...state.input].map((ch, i) => (
+        {input.map((ch, i) => (
           <span
           key={i}
           className={`${styles.cell} ${i === state.headIndex ? styles.active : ""}`}>
@@ -56,14 +61,19 @@ export default function Tape({ state, setState}: Props) {
         ))}
       </div>
 
+      <div className={styles.stateInfo}>
+        <div>Current State: <span>{state.showCurState}</span></div>
+        <div>Current Speed: <span>instruction/{Math.max(Math.abs(state.runSpeed-100)*10, 1)}ms</span></div>
+      </div>
+
       <div className={styles.controls}>
-        <button onClick={() => step(state, setState)}>Step</button>
+        <button onClick={() => {!state.run && step(state, setState)}}>Step</button>
         {!state.run
           ? <button onClick={() => run(state, setState)}>Run</button>
           : <button onClick={() => pause(state, setState)}>Pause</button>
         }
         <button onClick={() => reset(state, setState)}>Reset</button>
-        <input type="range" min="1" max="100" onChange={(v) => setState(s => ({...s, runSpeed:Number(v.target.value)}))} />
+        <input type="range" min="0" max="100" onChange={(v) => setState(s => ({...s, runSpeed:Number(v.target.value)}))} />
       </div>
     </div>
   );
@@ -78,15 +88,9 @@ function step(state: TapeState, setState: SetTapeState, updateState=true): TapeS
   let curState: string = state.curState;
   if (isEmptyObj(machineDict))
     [machineDict, curState] = loadCodeIntoStateMachine(state);
-  if (isEmptyObj(machineDict) || curState === "") {
-    console.error("TODO - error reason here.");
-    return {} as TapeState;
-  }
 
-  if (curState.match(haltPat)) {
-    console.log("TODO - Insert halt/done logic here.");
+  if (curState.match(haltPat))
     return {} as TapeState;
-  }
 
   const cursymbol = state.input[state.headIndex];
   const curstep = machineDict[curState][cursymbol];
@@ -109,7 +113,7 @@ function step(state: TapeState, setState: SetTapeState, updateState=true): TapeS
   } else if (direction === "l") {
     newHeadIndex -= 1;
   } else if (direction !== "*") {
-    console.error("TODO - error here on wrong symbol?")
+    console.error(`ERROR: Only directions are 'l', 'r', and '*', but a rule used '${direction}'.`);
     return {} as TapeState;
   }
 
@@ -124,6 +128,7 @@ function step(state: TapeState, setState: SetTapeState, updateState=true): TapeS
     input:newInput.join(""),
     headIndex:newHeadIndex,
     curState:newState,
+    ShowCurState:newState,
     machineDict:machineDict,
     curLine:instructionline-1,
     isCodeDisabled:true,
@@ -132,6 +137,8 @@ function step(state: TapeState, setState: SetTapeState, updateState=true): TapeS
   if (updateState) {
     const nextTapeState = step(newTapeState, setState, false);
     newTapeState.nextLine = nextTapeState.curLine;
+    if (nextTapeState.curLine != undefined)
+      newTapeState.showCurState = nextTapeState.curState;
     setState(newTapeState);
   }
 
@@ -147,7 +154,10 @@ function pause(state: TapeState, setState: SetTapeState) {
 }
 
 function reset(state: TapeState, setState: SetTapeState) {
-  const input: RegExpMatchArray | null = state.code.current.match(/input:[ ]*([01]+)/) ?? ["  ","  "];
+  let input: RegExpMatchArray | null = state.code.current.match(/input:[ ]*([a-zA-Z0-9-]+)/);
+  input ??= ["  ", "  "];
+  let showCurState: RegExpMatchArray | null = state.code.current.match(/([a-zA-Z0-9_]+) ([a-zA-Z0-9_]) ([a-zA-Z0-9_]) ([lr\*]) ([a-zA-Z0-9_]+)/);
+  showCurState ??= ["", ""];
 
   setState({...state,
     run:false,
@@ -155,6 +165,7 @@ function reset(state: TapeState, setState: SetTapeState) {
     headIndex:0,
     machineDict:{},
     curState:"",
+    showCurState: showCurState[1],
     curLine:-1,
     nextLine:-1,
     isCodeDisabled:false,

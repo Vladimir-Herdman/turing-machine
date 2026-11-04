@@ -1,5 +1,5 @@
 .body {
-  --bodyheight: 90vh;
+  --bodyheight: 80vh;
 
   width: 100%;
   height: var(--bodyheight);
@@ -16,10 +16,6 @@
 .graph {
   flex: 1;
 }
-
-/* .slider { */
-/*   --null: "null" */
-/* } */
 
 .code {
   --null: "null";

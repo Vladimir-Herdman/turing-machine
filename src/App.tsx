@@ -12,11 +12,12 @@ function App() {
   const [tapeState, setTapeState] = useState<TapeState>({
     runSpeed:50,
     run: false,
-    input:codeExamples[Object.keys(codeExamples)[0]].match(/input:[ ]*([01]+)/)![1],
+    input:codeExamples[Object.keys(codeExamples)[0]].match(/input:[ ]*([a-zA-Z0-9-]+)/)![1],
     headIndex:0,
     code:codeRef,
     machineDict: {},
     curState: "",
+    showCurState: codeExamples[Object.keys(codeExamples)[0]].match(/([a-zA-Z0-9_]+) ([a-zA-Z0-9_]) ([a-zA-Z0-9_]) ([lr\*]) ([a-zA-Z0-9_]+)/)![1],
     curLine: -1,
     nextLine: -1,
     isCodeDisabled:false,
