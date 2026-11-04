@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { initialCodeExample } from './examples-strings';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { codeExamples } from './examples-strings';
 import styles from './Codeblock.module.css'
 import type { TapeState } from '../tape/Tape';
 
@@ -14,7 +14,7 @@ const inputPat = /input:[ ]*([01]+)/;
 const errorPat = /(.+ .+ .+ [lr\*] .+)|([a-z]+:[ ]*[a-z0-1]+)/
 let errorCount = 0;
 
-export default function Codeblock({tapeState, initialVal=initialCodeExample, onChange}: Props) {
+export default function Codeblock({tapeState, initialVal=codeExamples[Object.keys(codeExamples)[0]], onChange}: Props) {
   const [code, setCode] = useState(initialVal);
   const [caret, setCaret] = useState(initialVal.length); // offset into the string
   const [curScrollTop, setCurScrollTop] = useState(0);
@@ -32,7 +32,7 @@ export default function Codeblock({tapeState, initialVal=initialCodeExample, onC
 
   //Called once at startup/load, since empty dependency array.
   useEffect(() => {
-    update(initialCodeExample);
+    update(initialVal);
   }, []);
 
   useEffect(() => {
@@ -62,7 +62,6 @@ export default function Codeblock({tapeState, initialVal=initialCodeExample, onC
       e.preventDefault();
       insertAtCursor(e, code, update, "  ", 2);
     }
-    console.log("here");
   };
 
   const coloredCode: any = splitByTokens(code);
@@ -73,6 +72,10 @@ export default function Codeblock({tapeState, initialVal=initialCodeExample, onC
 
   return (
     <div className={styles.code}>
+      <select className={styles.select} onChange={(e) => update(codeExamples[e.target.value])}>
+        {Object.keys(codeExamples).map((opt: string, i: number) => (<option key={i}>{opt}</option>))}
+      </select>
+
       <div className={styles.lineNumbers} ref={lineNumbersRef}>
         {getLineNumbers(code)}
       </div>

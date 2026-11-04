@@ -1,8 +1,9 @@
-export const initialCodeExample = `//INITIAL PROGRAM INTRO
+export const codeExamples: Record<string, string> = {
+    "Initial Example": `//INITIAL PROGRAM - ODD NUMBER CHECKER
 //The following is just a base example to check if an input has an even/odd
 //number of 1s in it. The machine will 'halt' once it's reached a state with
-//'halt' anywhere in the state name, or there are no more moves for an input
-//and state.
+//'halt'|'accept'|'reject' anywhere in the state name, or there are no more
+//moves for an input and state.
 //The tape will end up being 0 if even, and 1 if odd.
 
 //Hit the 'examples' dropdown in the corner to see some more example programs.
@@ -22,4 +23,19 @@ even _ 0 l halt
 
 odd 0 _ r odd
 odd 1 _ r even
-odd _ 1 l halt`;
+odd _ 1 l halt`,
+
+
+    "Count Up": `//Increment a binary value up by 1 infinitely.
+
+input: 0
+
+//states
+0 0 0 r 0
+0 1 1 r 0
+0 _ _ l 1
+
+1 0 1 r 0
+1 1 0 l 1
+1 _ 1 r 0`
+};

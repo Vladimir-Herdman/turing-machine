@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import styles from './App.module.css'
 import Codeblock from './components/codeblock/Codeblock'
-import { initialCodeExample } from './components/codeblock/examples-strings'
+import { codeExamples } from './components/codeblock/examples-strings'
 import Tape from './components/tape/Tape'
 import type { TapeState } from './components/tape/Tape'
 
@@ -12,7 +12,7 @@ function App() {
   const [tapeState, setTapeState] = useState<TapeState>({
     runSpeed:50,
     run: false,
-    input:initialCodeExample.match(/input:[ ]*([01]+)/)![1],
+    input:codeExamples[Object.keys(codeExamples)[0]].match(/input:[ ]*([01]+)/)![1],
     headIndex:0,
     code:codeRef,
     machineDict: {},

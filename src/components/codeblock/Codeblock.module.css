@@ -133,3 +133,21 @@
   color: red !important;
   background-color: yellow;
 }
+
+.select {
+  width: fit-content;
+  height: 4ch;
+  border: solid black 1.5px;
+  background-color: lightgrey;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 2.5ch;
+  right: 0;
+  z-index: 1003;
+  font: var(--codefont);
+  font-weight: bold;
+
+  &:hover {
+    cursor: pointer;
+  }
+}

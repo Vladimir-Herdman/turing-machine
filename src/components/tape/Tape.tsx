@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import styles from './Tape.module.css'
 
 type MachineDict = Record<string, Record<string, StateMachine>>;
@@ -28,13 +28,20 @@ type Props = {
   setState: SetTapeState;
 };
 
+const haltPat = /.*(halt|accept|reject).*/i;
+
 export default function Tape({ state, setState}: Props) {
 
-  if (state.run && !state.curState.match(/.*halt.*/)) {
-    setTimeout(() => {
+  useEffect(() => {
+    if (!state.run && !state.curState.match(haltPat))
+      return;
+
+    const id = setTimeout(() => {
       step(state, setState);
-    }, Math.abs(state.runSpeed-100)*10);
-  }
+    }, Math.max(Math.abs(state.runSpeed-100)*10, 1));
+
+    return () => clearTimeout(id);
+  }, [state]);
 
   return (
     <div className={styles.tape}>
@@ -51,7 +58,10 @@ export default function Tape({ state, setState}: Props) {
 
       <div className={styles.controls}>
         <button onClick={() => step(state, setState)}>Step</button>
-        <button onClick={() => run(state, setState)}>Run</button>
+        {!state.run
+          ? <button onClick={() => run(state, setState)}>Run</button>
+          : <button onClick={() => pause(state, setState)}>Pause</button>
+        }
         <button onClick={() => reset(state, setState)}>Reset</button>
         <input type="range" min="1" max="100" onChange={(v) => setState(s => ({...s, runSpeed:Number(v.target.value)}))} />
       </div>
@@ -73,7 +83,7 @@ function step(state: TapeState, setState: SetTapeState, updateState=true): TapeS
     return {} as TapeState;
   }
 
-  if (curState.match(/.*halt.*/)) {
+  if (curState.match(haltPat)) {
     console.log("TODO - Insert halt/done logic here.");
     return {} as TapeState;
   }
@@ -105,7 +115,7 @@ function step(state: TapeState, setState: SetTapeState, updateState=true): TapeS
 
   if (newHeadIndex >= newInput.length)
     newInput = [...newInput, " "];
-  if (newHeadIndex <= state.headIndex && newHeadIndex <= 0) {
+  if (newHeadIndex < 0) {
     newHeadIndex = 0;
     newInput = [" ", ...newInput];
   }
@@ -119,13 +129,11 @@ function step(state: TapeState, setState: SetTapeState, updateState=true): TapeS
     isCodeDisabled:true,
   }
 
-  const nextTapeState = step(newTapeState, setState, false);
-  newTapeState = {...newTapeState,
-    nextLine:nextTapeState.curLine,
-  };
-
-  if (updateState)
+  if (updateState) {
+    const nextTapeState = step(newTapeState, setState, false);
+    newTapeState.nextLine = nextTapeState.curLine;
     setState(newTapeState);
+  }
 
   return newTapeState;
 }
@@ -134,10 +142,16 @@ function run(state: TapeState, setState: SetTapeState) {
   setState({...state, run:true, isCodeDisabled:true});
 }
 
+function pause(state: TapeState, setState: SetTapeState) {
+  setState({...state, run:false});
+}
+
 function reset(state: TapeState, setState: SetTapeState) {
+  const input: RegExpMatchArray | null = state.code.current.match(/input:[ ]*([01]+)/) ?? ["  ","  "];
+
   setState({...state,
     run:false,
-    input:state.code.current.match(/input:[ ]*([01]+)/)![1],
+    input:input[1],
     headIndex:0,
     machineDict:{},
     curState:"",
