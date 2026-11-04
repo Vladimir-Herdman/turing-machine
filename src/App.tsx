@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
 import styles from './App.module.css'
 import Codeblock from './components/codeblock/Codeblock'
-import { codeExamples } from './components/codeblock/examples-strings'
+import { codeExamples } from './constants/codeExamples'
 import Tape from './components/tape/Tape'
 import type { TapeState } from './components/tape/Tape'
+import { inputLinePat, instructionPat } from './constants/regexPats'
 
 //TODO: Look into [SVG.js](https://svgjs.dev/docs/3.0/) for creating the graph
 //and animating it with program execution.
@@ -12,12 +13,12 @@ function App() {
   const [tapeState, setTapeState] = useState<TapeState>({
     runSpeed:50,
     run: false,
-    input:codeExamples[Object.keys(codeExamples)[0]].match(/input:[ ]*([a-zA-Z0-9-]+)/)![1],
+    input:codeExamples[Object.keys(codeExamples)[0]].match(inputLinePat)![1],
     headIndex:0,
     code:codeRef,
     machineDict: {},
     curState: "",
-    showCurState: codeExamples[Object.keys(codeExamples)[0]].match(/([a-zA-Z0-9_]+) ([a-zA-Z0-9_]) ([a-zA-Z0-9_]) ([lr\*]) ([a-zA-Z0-9_]+)/)![1],
+    showCurState: codeExamples[Object.keys(codeExamples)[0]].match(instructionPat)![1],
     curLine: -1,
     nextLine: -1,
     isCodeDisabled:false,

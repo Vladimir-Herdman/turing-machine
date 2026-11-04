@@ -1,5 +1,6 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import styles from './Tape.module.css'
+import { haltPat, inputPat, instructionPat } from '../../constants/regexPats';
 
 type MachineDict = Record<string, Record<string, StateMachine>>;
 export type TapeState = {
@@ -28,8 +29,6 @@ type Props = {
   state: TapeState;
   setState: SetTapeState;
 };
-
-const haltPat = /.*(halt|accept|reject).*/i;
 
 export default function Tape({ state, setState}: Props) {
 
@@ -154,9 +153,9 @@ function pause(state: TapeState, setState: SetTapeState) {
 }
 
 function reset(state: TapeState, setState: SetTapeState) {
-  let input: RegExpMatchArray | null = state.code.current.match(/input:[ ]*([a-zA-Z0-9-]+)/);
+  let input: RegExpMatchArray | null = state.code.current.match(inputPat);
   input ??= ["  ", "  "];
-  let showCurState: RegExpMatchArray | null = state.code.current.match(/([a-zA-Z0-9_]+) ([a-zA-Z0-9_]) ([a-zA-Z0-9_]) ([lr\*]) ([a-zA-Z0-9_]+)/);
+  let showCurState: RegExpMatchArray | null = state.code.current.match(instructionPat);
   showCurState ??= ["", ""];
 
   setState({...state,
@@ -177,7 +176,6 @@ function reset(state: TapeState, setState: SetTapeState) {
 //machine, which will have another record in it for each input, like if you see
 //a '0' or a '1'. so call dict[state][input-char], which gets <direction,
 //replacement character, newstate>.
-const instructionPat = /([a-zA-Z0-9_]+) ([a-zA-Z0-9_]) ([a-zA-Z0-9_]) ([lr\*]) ([a-zA-Z0-9_]+)/;
 function loadCodeIntoStateMachine(state: TapeState): [machineDict: MachineDict, startState: string] {
   if (!state.code.current || state.code.current === "") {
     console.error("No code that can currently be loaded into state machine.");

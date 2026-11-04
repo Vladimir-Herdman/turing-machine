@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
-import { codeExamples } from './examples-strings';
+import { useEffect, useRef, useState } from 'react'
+import { codeExamples } from '../../constants/codeExamples';
 import styles from './Codeblock.module.css'
 import type { TapeState } from '../tape/Tape';
+import { commentPat, inputLinePat, errorPat, inputPat } from '../../constants/regexPats';
 
 type Props = {
   tapeState: TapeState;
@@ -9,9 +10,6 @@ type Props = {
   onChange: (codeText: string, input: string) => void;
 };
 
-const commentPat = /(\/\/.*)/;
-const inputPat = /input:[ ]*([a-zA-Z0-9-]+)/;
-const errorPat = /(.+ .+ .+ [lr\*] .+)|([a-z]+:[ ]*[a-z0-1]+)/
 let errorCount = 0;
 
 export default function Codeblock({tapeState, initialVal=codeExamples[Object.keys(codeExamples)[0]], onChange}: Props) {
@@ -26,7 +24,7 @@ export default function Codeblock({tapeState, initialVal=codeExamples[Object.key
     setCode(val);
     if (newCaret)
       setCaret(newCaret);
-    const input = val.match(inputPat) ?? ["", ""];
+    const input = val.match(inputLinePat) ?? ["", ""];
     onChange(val, input[1]);
   };
 
@@ -143,11 +141,11 @@ function splitByTokens(text: string) {
   let lines = text.split("\n");
   let inputSet = false;
   for (let i=0; i<lines.length; i++){
-    let [plain, comment] = lines[i].split(/(\/\/.*)/);
+    let [plain, comment] = lines[i].split(commentPat);
 
     if (plain) {
-      if (!inputSet && plain.match(inputPat)) {
-        plain.split(/([a-zA-Z0-9-]+)/).map((str, i) => {
+      if (!inputSet && plain.match(inputLinePat)) {
+        plain.split(inputPat).map((str, i) => {
           if (i === 3)
             tokens.push({text: str, token: "input"})
           else

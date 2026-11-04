@@ -67,4 +67,4 @@ q5 _ _ l q6
 q6 b _ l q4
 q6 _ _ * q7
 `,
-};
+} as const;
