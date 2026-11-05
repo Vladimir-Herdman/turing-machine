@@ -15,6 +15,7 @@ export type TapeState = {
   headIndex: number;
   code: React.RefObject<string>;
   isCodeDisabled: boolean;
+  stepCount: number;
 };
 
 type StateMachine = {
@@ -24,7 +25,7 @@ type StateMachine = {
   direction: string;
 };
 
-type SetTapeState = Dispatch<SetStateAction<TapeState>>;
+export type SetTapeState = Dispatch<SetStateAction<TapeState>>;
 type Props = {
   state: TapeState;
   setState: SetTapeState;
@@ -62,11 +63,12 @@ export default function Tape({ state, setState}: Props) {
 
       <div className={styles.stateInfo}>
         <div>Current State: <span>{state.showCurState}</span></div>
+        <div>Number of Steps: <span>{state.stepCount}</span></div>
         <div>Current Speed: <span>instruction/{Math.max(Math.abs(state.runSpeed-100)*10, 1)}ms</span></div>
       </div>
 
       <div className={styles.controls}>
-        <button onClick={() => {!state.run && step(state, setState)}}>Step</button>
+        <button onClick={() => {step(state, setState)}} disabled={state.run}>Step</button>
         {!state.run
           ? <button onClick={() => run(state, setState)}>Run</button>
           : <button onClick={() => pause(state, setState)}>Pause</button>
@@ -131,6 +133,7 @@ function step(state: TapeState, setState: SetTapeState, updateState=true): TapeS
     machineDict:machineDict,
     curLine:instructionline-1,
     isCodeDisabled:true,
+    stepCount: state.stepCount + 1,
   }
 
   if (updateState) {
@@ -168,6 +171,7 @@ function reset(state: TapeState, setState: SetTapeState) {
     curLine:-1,
     nextLine:-1,
     isCodeDisabled:false,
+    stepCount:0,
   })
 }
 

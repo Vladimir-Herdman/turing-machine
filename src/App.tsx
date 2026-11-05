@@ -22,13 +22,12 @@ function App() {
     curLine: -1,
     nextLine: -1,
     isCodeDisabled:false,
+    stepCount:0,
   });
 
-  const onCodeUpdate = (code: string, input: string, clean: boolean) => {
+  const onCodeUpdate = (code: string, input: string) => {
     codeRef.current = code;
     let s = {...tapeState, input:input};
-    if (clean)
-      s = {...s, curLine:-1, nextLine:-1};
     setTapeState(s);
   };
 
@@ -41,7 +40,7 @@ function App() {
         <Tape state={tapeState} setState={setTapeState} />
         <div className={styles.visuals}>
           <div className={styles.graph}></div>
-          <div className={styles.code}><Codeblock tapeState={tapeState} onChange={onCodeUpdate} /></div>
+          <div className={styles.code}><Codeblock tapeState={tapeState} setTapeState={setTapeState} onChange={onCodeUpdate} /></div>
         </div>
       </div>
     </>

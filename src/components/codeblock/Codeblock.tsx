@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { codeExamples } from 'src/constants/codeExamples';
 import styles from './Codeblock.module.css'
-import { type TapeState } from 'src/components/tape/Tape';
-import { commentPat, inputLinePat, errorPat, inputPat } from 'src/constants/regexPats';
+import { type TapeState, type SetTapeState } from 'src/components/tape/Tape';
+import { commentPat, inputLinePat, errorPat, inputPat, instructionPat } from 'src/constants/regexPats';
 
 type Props = {
   tapeState: TapeState;
+  setTapeState: SetTapeState;
   initialVal?: string;
-  onChange: (codeText: string, input: string, clean: boolean) => void;
+  onChange: (codeText: string, input: string) => void;
 };
 
 let errorCount = 0;
 
-export default function Codeblock({tapeState, initialVal=codeExamples[Object.keys(codeExamples)[0]], onChange}: Props) {
+export default function Codeblock({tapeState, setTapeState, initialVal=codeExamples[Object.keys(codeExamples)[0]], onChange}: Props) {
   const [code, setCode] = useState(initialVal);
   const [caret, setCaret] = useState(initialVal.length); // offset into the string
   const [curScrollTop, setCurScrollTop] = useState(0);
@@ -20,12 +21,12 @@ export default function Codeblock({tapeState, initialVal=codeExamples[Object.key
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
 
-  const update = (val: string, newCaret?: number, clean: boolean=false) => {
+  const update = (val: string, newCaret?: number) => {
     setCode(val);
     if (newCaret)
       setCaret(newCaret);
     const input = val.match(inputLinePat) ?? ["", ""];
-    onChange(val, input[1], clean);
+    onChange(val, input[1]);
   };
 
   //Called once at startup/load, since empty dependency array.
@@ -70,7 +71,7 @@ export default function Codeblock({tapeState, initialVal=codeExamples[Object.key
 
   return (
     <div className={styles.code}>
-      <select className={styles.select} onChange={(e) => update(codeExamples[e.target.value], undefined, true)}>
+      <select className={styles.select} disabled={tapeState.isCodeDisabled} onChange={(e) => fullUpdate(update, codeExamples[e.target.value], true, tapeState, setTapeState)}>
         {Object.keys(codeExamples).map((opt: string, i: number) => (<option key={i}>{opt}</option>))}
       </select>
 
@@ -122,6 +123,26 @@ export default function Codeblock({tapeState, initialVal=codeExamples[Object.key
       />
     </div>
   );
+}
+
+function fullUpdate(updateFunc: any, codeText: string, clean: boolean, state: TapeState, setState: SetTapeState) {
+    updateFunc(codeText);
+    const input: RegExpMatchArray = codeText.match(inputLinePat) ?? ["  ", "  "];
+    const showCurState: RegExpMatchArray = codeText.match(instructionPat) ?? ["", ""];
+    if (clean)
+      setState({...state,
+        curLine:-1,
+        nextLine:-1,
+        input:input[1],
+        showCurState:showCurState[1],
+        run:false,
+        headIndex:0,
+        machineDict:{},
+        curState:"",
+        isCodeDisabled:false,
+        stepCount:0,
+    });
+
 }
 
 function insertAtCursor(e: any, state: any, setState: any, addition: string, cursorPos: number) {
