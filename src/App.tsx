@@ -34,8 +34,9 @@ function App() {
   return (
     <>
       <header>
-        <h1>Turing Machine</h1>
+        <h1>Turing Machine Simulator</h1>
       </header>
+
       <div className={styles.body}>
         <Tape state={tapeState} setState={setTapeState} />
         <div className={styles.visuals}>
@@ -43,6 +44,11 @@ function App() {
           <div className={styles.code}><Codeblock tapeState={tapeState} setTapeState={setTapeState} onChange={onCodeUpdate} /></div>
         </div>
       </div>
+
+      <footer>
+        <p>© 2026 Vladimir Herdman</p>
+        <p>Website statically hosted through GitHub Pages at <a href="https://github.com/Vladimir-Herdman/turing-machine" target="_blank">this repository</a></p>
+      </footer>
     </>
   );
 }

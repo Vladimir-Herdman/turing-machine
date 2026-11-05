@@ -20,3 +20,18 @@
 .code {
   --null: "null";
 }
+
+h1 {
+  margin-left: 20px;
+}
+
+footer {
+  position: absolute;
+  width: 100%;
+  height: 7vh;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
