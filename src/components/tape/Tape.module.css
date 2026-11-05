@@ -32,6 +32,7 @@
 
   & > div {
     padding: 10px;
+    font: 16px 'Times New Roman', Times, serif, Cambria, Cochin, Georgia;
     border-radius: 3px;
     border: solid brown 1px;
     background-color: #dea63e;
@@ -45,6 +46,7 @@
 }
 
 .controls {
+  font: 16px 'Times New Roman', Times, serif, Cambria, Cochin, Georgia;
   margin-top: 25px;
   display: flex;
   flex-direction: row;
@@ -54,9 +56,11 @@
 
   & > button {
     padding: 10px;
+    font: 16px 'Times New Roman', Times, serif, Cambria, Cochin, Georgia;
   }
   & > input {
     width: 200px;
+    font: 14px 'Times New Roman', Times, serif, Cambria, Cochin, Georgia;
     position: relative;
 
     &:after {

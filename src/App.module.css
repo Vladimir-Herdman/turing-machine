@@ -34,4 +34,5 @@ footer {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  font: 16px 'Times New Roman', Times, serif, Cambria, Cochin, Georgia;
 }
