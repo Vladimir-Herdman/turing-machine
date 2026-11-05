@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { codeExamples } from '../../constants/codeExamples';
+import { codeExamples } from 'src/constants/codeExamples';
 import styles from './Codeblock.module.css'
-import type { TapeState } from '../tape/Tape';
-import { commentPat, inputLinePat, errorPat, inputPat } from '../../constants/regexPats';
+import { type TapeState } from 'src/components/tape/Tape';
+import { commentPat, inputLinePat, errorPat, inputPat } from 'src/constants/regexPats';
 
 type Props = {
   tapeState: TapeState;
   initialVal?: string;
-  onChange: (codeText: string, input: string) => void;
+  onChange: (codeText: string, input: string, clean: boolean) => void;
 };
 
 let errorCount = 0;
@@ -20,12 +20,12 @@ export default function Codeblock({tapeState, initialVal=codeExamples[Object.key
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
 
-  const update = (val: string, newCaret?: number) => {
+  const update = (val: string, newCaret?: number, clean: boolean=false) => {
     setCode(val);
     if (newCaret)
       setCaret(newCaret);
     const input = val.match(inputLinePat) ?? ["", ""];
-    onChange(val, input[1]);
+    onChange(val, input[1], clean);
   };
 
   //Called once at startup/load, since empty dependency array.
@@ -70,7 +70,7 @@ export default function Codeblock({tapeState, initialVal=codeExamples[Object.key
 
   return (
     <div className={styles.code}>
-      <select className={styles.select} onChange={(e) => update(codeExamples[e.target.value])}>
+      <select className={styles.select} onChange={(e) => update(codeExamples[e.target.value], undefined, true)}>
         {Object.keys(codeExamples).map((opt: string, i: number) => (<option key={i}>{opt}</option>))}
       </select>
 

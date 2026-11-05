@@ -27,7 +27,7 @@ odd 1 _ r even
 odd _ 1 l halt`,
 
 
-    "Count Up": `//Increment a binary value up by 1 infinitely.
+    "Count Up": `//Increment a binary value by 1 indefinitely.
 
 input: 0
 

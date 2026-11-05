@@ -4,11 +4,16 @@ import babel from '@rolldown/plugin-babel';
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [
-        react(),
-        babel({
-            presets: [reactCompilerPreset()]
-        }),
-    ],
-    base: '/turing-machine/'
+  plugins: [
+    react(),
+    babel({
+      presets: [reactCompilerPreset()],
+    }),
+  ],
+  base: '/turing-machine/',
+  resolve: {
+    alias: {
+      src: "/src",
+    },
+  },
 })

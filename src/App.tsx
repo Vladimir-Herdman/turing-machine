@@ -24,9 +24,12 @@ function App() {
     isCodeDisabled:false,
   });
 
-  const onCodeUpdate = (code: string, input: string) => {
+  const onCodeUpdate = (code: string, input: string, clean: boolean) => {
     codeRef.current = code;
-    setTapeState(s => ({...s, input:input}));
+    let s = {...tapeState, input:input};
+    if (clean)
+      s = {...s, curLine:-1, nextLine:-1};
+    setTapeState(s);
   };
 
   return (

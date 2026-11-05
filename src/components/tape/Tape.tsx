@@ -1,6 +1,6 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import styles from './Tape.module.css'
-import { haltPat, inputPat, instructionPat } from '../../constants/regexPats';
+import { haltPat, inputLinePat, instructionPat } from 'src/constants/regexPats';
 
 type MachineDict = Record<string, Record<string, StateMachine>>;
 export type TapeState = {
@@ -153,7 +153,7 @@ function pause(state: TapeState, setState: SetTapeState) {
 }
 
 function reset(state: TapeState, setState: SetTapeState) {
-  let input: RegExpMatchArray | null = state.code.current.match(inputPat);
+  let input: RegExpMatchArray | null = state.code.current.match(inputLinePat);
   input ??= ["  ", "  "];
   let showCurState: RegExpMatchArray | null = state.code.current.match(instructionPat);
   showCurState ??= ["", ""];
