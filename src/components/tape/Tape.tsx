@@ -1,6 +1,8 @@
-import { useEffect, type Dispatch, type SetStateAction } from 'react';
+import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import styles from './Tape.module.css'
 import { haltPat, inputLinePat, instructionPat } from 'src/constants/regexPats';
+import { compress } from 'src/utils/compression';
+
 
 type MachineDict = Record<string, Record<string, StateMachine>>;
 export type TapeState = {
@@ -32,10 +34,17 @@ type Props = {
 };
 
 export default function Tape({ state, setState}: Props) {
+  const [copyToast, setCopyToast] = useState(0);
 
   useEffect(() => {
-    if (!state.run && !state.curState.match(haltPat))
-      return;
+    if (copyToast === 0) return;
+
+    const id = setTimeout(() => {setCopyToast(0)}, 1600);
+    return () => clearTimeout(id);
+  }, [copyToast]);
+
+  useEffect(() => {
+    if (!state.run && !state.curState.match(haltPat)) return;
 
     const id = setTimeout(() => {
       step(state, setState);
@@ -47,6 +56,11 @@ export default function Tape({ state, setState}: Props) {
   let input = [...state.input];
   if (input.length === 0)
     input = [" "];
+
+  const copyProgramToUrl = async () => {
+    copyCodeToLink(state.code);
+    setCopyToast((t) => t + 1);
+  };
 
   return (
     <div className={styles.tape}>
@@ -76,8 +90,19 @@ export default function Tape({ state, setState}: Props) {
         <button onClick={() => reset(state, setState)}>Reset</button>
         <input type="range" min="0" max="100" onChange={(v) => setState(s => ({...s, runSpeed:Number(v.target.value)}))} />
       </div>
+
+      <button className={styles.share} onClick={() => copyProgramToUrl()}>Copy Program To Link</button>
+      {copyToast !== 0 && (<div key={copyToast} className={styles.pToast}>URL copied to clipboard</div>)}
     </div>
   );
+}
+
+async function copyCodeToLink(codeRef: React.RefObject<string>) {
+  const compressedProgram = compress(codeRef.current);
+  const url = `${window.location.origin}/?p=${encodeURIComponent(compressedProgram)}`;
+  if (url.length > 2000)
+    console.error("URL number of characters greater than 2000, might not work in certain browsers.");
+  await navigator.clipboard.writeText(url);
 }
 
 function isEmptyObj(o: any): boolean {

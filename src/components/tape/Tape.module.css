@@ -57,11 +57,18 @@
   & > button {
     padding: 10px;
     font: 16px 'Times New Roman', Times, serif, Cambria, Cochin, Georgia;
+    &:hover {
+      cursor: pointer;
+    }
   }
   & > input {
     width: 200px;
     font: 14px 'Times New Roman', Times, serif, Cambria, Cochin, Georgia;
     position: relative;
+
+    &:hover {
+      cursor: pointer;
+    }
 
     &:after {
       content: 'Run Speed';
@@ -90,4 +97,30 @@
   bottom: -26px;
   left: 50%;
   transform: translateX(-55%);
+}
+
+.share {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 3px;
+  font: 16px 'Times New Roman', Times, serif, Cambria, Cochin, Georgia;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.pToast {
+  position: absolute;
+  bottom: 15px;
+  right: 5px;
+  border: solid grey 1px;
+  background-color: lightgrey;
+  user-select: none;
+  pointer-events: none;
+  animation: fade 1.5s linear forwards;
+}
+@keyframes fade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
