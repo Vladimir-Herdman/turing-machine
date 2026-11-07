@@ -99,7 +99,7 @@ export default function Tape({ state, setState}: Props) {
 
 async function copyCodeToLink(codeRef: React.RefObject<string>) {
   const compressedProgram = compress(codeRef.current);
-  const url = `${window.location.origin}/?p=${encodeURIComponent(compressedProgram)}`;
+  const url = `${window.location.href.split("?")[0]}?p=${encodeURIComponent(compressedProgram)}`;
   if (url.length > 2000)
     console.error("URL number of characters greater than 2000, might not work in certain browsers.");
   await navigator.clipboard.writeText(url);
