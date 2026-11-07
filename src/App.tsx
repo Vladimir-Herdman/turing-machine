@@ -5,6 +5,7 @@ import { codeExamples } from './constants/codeExamples'
 import Tape from './components/tape/Tape'
 import type { TapeState } from './components/tape/Tape'
 import { inputLinePat, instructionPat } from './constants/regexPats'
+import { decompress } from './utils/compression'
 
 //TODO: Look into [SVG.js](https://svgjs.dev/docs/3.0/) for creating the graph
 //and animating it with program execution.
@@ -31,6 +32,8 @@ function App() {
     setTapeState(s);
   };
 
+  const programText = getInitialProgram();
+
   return (
     <>
       <header>
@@ -41,7 +44,7 @@ function App() {
         <Tape state={tapeState} setState={setTapeState} />
         <div className={styles.visuals}>
           <div className={styles.graph}></div>
-          <div className={styles.code}><Codeblock tapeState={tapeState} setTapeState={setTapeState} onChange={onCodeUpdate} /></div>
+          <div className={styles.code}><Codeblock tapeState={tapeState} setTapeState={setTapeState} initialVal={programText} onChange={onCodeUpdate} /></div>
         </div>
       </div>
 
@@ -51,6 +54,16 @@ function App() {
       </footer>
     </>
   );
+}
+
+function getInitialProgram() {
+  const programCompressedText = new URLSearchParams(window.location.search).get("p");
+  let program = "";
+  if (programCompressedText)
+    program = decompress(programCompressedText)
+  else
+    program = codeExamples[Object.keys(codeExamples)[0]];
+  return program
 }
 
 export default App

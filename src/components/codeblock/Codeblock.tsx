@@ -7,13 +7,13 @@ import { commentPat, inputLinePat, errorPat, inputPat, instructionPat } from 'sr
 type Props = {
   tapeState: TapeState;
   setTapeState: SetTapeState;
-  initialVal?: string;
+  initialVal: string;
   onChange: (codeText: string, input: string) => void;
 };
 
 let errorCount = 0;
 
-export default function Codeblock({tapeState, setTapeState, initialVal=codeExamples[Object.keys(codeExamples)[0]], onChange}: Props) {
+export default function Codeblock({tapeState, setTapeState, initialVal, onChange}: Props) {
   const [code, setCode] = useState(initialVal);
   const [caret, setCaret] = useState(initialVal.length); // offset into the string
   const [curScrollTop, setCurScrollTop] = useState(0);

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
+import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
 import styles from './Tape.module.css'
 import { haltPat, inputLinePat, instructionPat } from 'src/constants/regexPats';
 import { compress } from 'src/utils/compression';
