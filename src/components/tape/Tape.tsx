@@ -2,6 +2,7 @@ import { useState, useEffect, type Dispatch, type SetStateAction } from 'react';
 import styles from './Tape.module.css'
 import { haltPat, inputLinePat, instructionPat } from 'src/constants/regexPats';
 import { compress } from 'src/utils/compression';
+import { isEmptyObj } from 'src/utils/objects';
 
 
 type MachineDict = Record<string, Record<string, StateMachine>>;
@@ -103,10 +104,6 @@ async function copyCodeToLink(codeRef: React.RefObject<string>) {
   if (url.length > 2000)
     console.error("URL number of characters greater than 2000, might not work in certain browsers.");
   await navigator.clipboard.writeText(url);
-}
-
-function isEmptyObj(o: any): boolean {
-  return Object.keys(o).length === 0;
 }
 
 function step(state: TapeState, setState: SetTapeState, updateState=true): TapeState { //false if stop execution.

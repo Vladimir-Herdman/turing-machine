@@ -1,9 +1,13 @@
 .graph {
   width: 100%;
-  height: 100%;
+  height: calc(var(--bodyheight) - 15vh);
   display: flex;
   align-items: center;
   justify-content: center;
 
   border: solid red 1px;
+
+  & svg {
+    border: solid blue 1px;
+  }
 }
