@@ -1,9 +1,13 @@
 import { useRef, useState } from 'react'
-import styles from './App.module.css'
+
 import Codeblock from './components/codeblock/Codeblock'
-import { codeExamples } from './constants/codeExamples'
+import Graph from './components/graph/Graph'
 import Tape from './components/tape/Tape'
 import type { TapeState } from './components/tape/Tape'
+
+import styles from './App.module.css'
+
+import { codeExamples } from './constants/codeExamples'
 import { inputLinePat, instructionPat } from './constants/regexPats'
 import { decompress } from './utils/compression'
 
@@ -43,14 +47,14 @@ function App() {
       <div className={styles.body}>
         <Tape state={tapeState} setState={setTapeState} />
         <div className={styles.visuals}>
-          <div className={styles.graph}></div>
+          <div className={styles.graph}><Graph state={tapeState} /></div>
           <div className={styles.code}><Codeblock tapeState={tapeState} setTapeState={setTapeState} initialVal={programText} onChange={onCodeUpdate} /></div>
         </div>
       </div>
 
       <footer>
         <p>© 2026 Vladimir Herdman</p>
-        <p>Website statically hosted through GitHub Pages at <a href="https://github.com/Vladimir-Herdman/turing-machine" target="_blank">this repository</a></p>
+        <p>Website hosted through GitHub Pages at <a href="https://github.com/Vladimir-Herdman/turing-machine" target="_blank">this repository</a></p>
       </footer>
     </>
   );
