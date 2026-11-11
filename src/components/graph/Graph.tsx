@@ -47,6 +47,28 @@ type Pos = {
   y: number;
 };
 function SVGInit(state: TapeState, copyFunc: (svg: Svg) => void) {
+  const [draw, center, radius, nstates] = setupSvgDrawing(state, copyFunc);
+  const degree_dif = 360/nstates;
+
+  let statePos: Record<string, Pos> = {};
+  for (let i=0; i<nstates; i++) {
+    const x = center + Math.round(Math.cos((degree_dif*(i*2))/360 * Math.PI) * radius);
+    const y = center + Math.round(Math.sin((degree_dif*(i*2))/360 * Math.PI) * radius);
+    const name = Object.keys(state.machineDict)[i];
+    statePos[name] = {x, y};
+  }
+
+  for (let i=0; i<nstates; i++) {
+    const name = Object.keys(statePos)[i];
+    const {x, y} = statePos[name];
+    drawArrows();
+    drawStateCircle(draw, name, x, y);
+  }
+
+  return draw;
+}
+
+function setupSvgDrawing(state: TapeState, copyFunc: (svg: Svg) => void): [draw: Svg, center: number, radius: number, nstates: number] {
   var draw = SVG().addTo("#graph").size("100%", "100%");
   draw.click(async () => { copyFunc(draw) });
   draw.viewbox(0, 0, 1000, 1000);
@@ -55,27 +77,25 @@ function SVGInit(state: TapeState, copyFunc: (svg: Svg) => void) {
   const center = 500;
   const radius = 300;
   const nstates = Object.keys(state.machineDict).length;
-  const degree_dif = 360/nstates;
 
-  let states: Record<string, Pos> = {};
-  for (let i=0; i<nstates; i++) {
-    const x = center + Math.cos((degree_dif*(i*2))/360 * Math.PI) * radius;
-    const y = center + Math.sin((degree_dif*(i*2))/360 * Math.PI) * radius;
-    const name = Object.keys(state.machineDict)[i];
-    states[name] = {x:x, y:y};
+  return [draw, center, radius, nstates]
+}
 
-    if (name.match(haltPat)) {
-      draw.circle(120).attr({ fill: "#000" }).center(x, y);
-      draw.circle(110).attr({ fill: "#fff" }).center(x, y);
-    }
-    draw.circle(100).attr({ fill: "#000" }).center(x, y);
-    draw.circle(90).attr({ fill: "#fff" }).center(x, y);
+function drawArrows() {
+  console.error("Need to implement 'drawArrows' function.");
+  return;
+}
 
-    const text = draw.text(`${name}`).attr({ fill:"#fff" })
-      .font({ family:"Times New Roman", size:32 })
-      .css({ "mix-blend-mode": "difference" })
-      .center(x, y-2);
+function drawStateCircle(draw: Svg, name: string, x: number, y: number) {
+  if (name.match(haltPat)) {
+    draw.circle(120).attr({ fill: "#000" }).center(x, y);
+    draw.circle(110).attr({ fill: "#fff" }).center(x, y);
   }
+  draw.circle(100).attr({ fill: "#000" }).center(x, y);
+  draw.circle(90).attr({ fill: "#fff" }).center(x, y);
 
-  return draw;
+  draw.text(`${name}`).attr({ fill:"#fff" })
+    .font({ family:"Times New Roman", size:32 })
+    .css({ "mix-blend-mode": "difference" })
+    .center(x, y-2);
 }
