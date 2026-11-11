@@ -24,7 +24,12 @@ even _ 0 l halt
 
 odd 0 _ r odd
 odd 1 _ r even
-odd _ 1 l halt`,
+odd _ 1 l halt
+
+//mostly as an example for the graph view, a halt state is made here (but
+//unneeded, as execution will stop once 'halt' is read as a state to
+//transition to).
+halt _ _ * halt`,
 
 
     "Count Up": `//Increment a binary value by 1 indefinitely.

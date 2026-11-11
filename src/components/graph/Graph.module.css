@@ -4,4 +4,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.pToast {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  border: solid grey 1px;
+  background-color: lightgrey;
+  user-select: none;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-50%);
+  animation: fade 1.5s linear forwards;
+  z-index: 1004;
+}
+@keyframes fade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
