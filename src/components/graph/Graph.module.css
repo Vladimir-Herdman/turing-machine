@@ -4,10 +4,4 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border: solid red 1px;
-
-  & svg {
-    border: solid blue 1px;
-  }
 }

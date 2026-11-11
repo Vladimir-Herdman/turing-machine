@@ -28,13 +28,32 @@ export default function Graph({state}: Props) {
   );
 }
 
+type Pos = {
+  x: number;
+  y: number;
+};
 function SVGInit(state: TapeState) {
   var draw = SVG().addTo("#graph").size("100%", "100%");
-  draw.viewbox(0, 0, 500, 500);
+  draw.viewbox(0, 0, 1000, 1000);
+  draw.rect(1000, 1000).fill("#fff");
 
-  draw.rect(200, 100).attr({ fill: '#f06' }).center(250, 250); //x,y
-  for (let i=0; i<Object.keys(state.machineDict).length; i++) {
-    draw.circle(100).attr({ fill: `#${i}${i}${i}` }).center(200 + 20*i, 250);
+  const center = 500;
+  const radius = 300;
+  const nstates = Object.keys(state.machineDict).length;
+  const degree_dif = 360/nstates;
+
+  let states: Record<string, Pos> = {};
+  for (let i=0; i<nstates; i++) {
+    const x = center + Math.cos((degree_dif*(i*2))/360 * Math.PI) * radius;
+    const y = center + Math.sin((degree_dif*(i*2))/360 * Math.PI) * radius;
+    const name = Object.keys(state.machineDict)[i];
+    states[name] = {x:x, y:y};
+
+    draw.circle(100).attr({ fill: "#000" }).center(x, y);
+    const text = draw.text(`${name}`).attr({ fill:"#fff" })
+      .font({ family:"Times New Roman", size:32 })
+      .css({ "mix-blend-mode": "difference" })
+      .center(x, y-2);
   }
 
   return draw;
