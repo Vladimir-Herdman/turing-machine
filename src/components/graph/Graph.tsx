@@ -58,10 +58,10 @@ function SVGInit(state: TapeState, copyFunc: (svg: Svg) => void) {
     statePos[name] = {x, y};
   }
 
+  drawArrows(draw, statePos, state);
   for (let i=0; i<nstates; i++) {
     const name = Object.keys(statePos)[i];
     const {x, y} = statePos[name];
-    drawArrows();
     drawStateCircle(draw, name, x, y);
   }
 
@@ -81,9 +81,61 @@ function setupSvgDrawing(state: TapeState, copyFunc: (svg: Svg) => void): [draw:
   return [draw, center, radius, nstates]
 }
 
-function drawArrows() {
-  console.error("Need to implement 'drawArrows' function.");
-  return;
+type StateInfo = {
+  name: string;
+  pos: Pos;
+  to: StateInfo[];
+}
+function drawArrows(draw: Svg, statePos: Record<string, Pos>, state: TapeState) {
+  //build data structure of states and states they point to, and info for each one they point to.
+  let stateInfo: StateInfo[] = getStateInfo(statePos, state);
+  console.log(stateInfo);
+}
+
+function getStateInfo(statePos: Record<string, Pos>, state: TapeState): StateInfo[] {
+  let stateInfo: StateInfo[] = [];
+  for (let i=0; i<Object.keys(statePos).length; i++) {
+    const sname = Object.keys(statePos)[i];
+    const transitions = state.machineDict[sname];
+
+    let toStates: StateInfo[] = []
+    Object.entries(transitions).filter(([, tval]) => tval.newState !== sname).forEach(([tinput, tval]) => {
+      if (tinput === " ")
+        tinput = "_";
+
+      const otherPointBacks = Object.values(state.machineDict[tval.newState]).filter(smd => smd.newState === sname);
+      let backTo = [];
+      if (otherPointBacks.length > 0)
+        backTo.push({} as StateInfo);
+
+      toStates.push({
+        name:tval.newState,
+        pos:statePos[tval.newState],
+
+        //include only if it points back at this state.
+        to:backTo,
+      });
+    });
+
+    stateInfo.push({
+      name:sname,
+      pos:statePos[sname],
+      to:toStates,
+    });
+  }
+
+  return stateInfo;
+}
+
+//arrows point to center of state circle, so shorten some so the arrow head is
+//visible instead of covered.
+function shortenByRadius(from: Pos, to: Pos, radius: number): Pos {
+  const [dx, dy] = [to.x - from.x, to.y - from.y];
+  const length = Math.hypot(dx, dy);
+  return {
+    x: Math.round(to.x - (dx / length)*radius),
+    y: Math.round(to.y - (dy / length)*radius)
+  };
 }
 
 function drawStateCircle(draw: Svg, name: string, x: number, y: number) {
