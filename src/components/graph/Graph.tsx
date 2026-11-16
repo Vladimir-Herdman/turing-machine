@@ -89,19 +89,28 @@ type StateInfo = {
 function drawArrows(draw: Svg, statePos: Record<string, Pos>, state: TapeState) {
   //build data structure of states and states they point to, and info for each one they point to.
   let stateInfo: StateInfo[] = getStateInfo(statePos, state);
-  console.log(stateInfo);
+  //console.log(stateInfo);
+  // stateInfo.forEach((s) => {
+  //   console.log(s);
+  // });
 }
 
 function getStateInfo(statePos: Record<string, Pos>, state: TapeState): StateInfo[] {
   let stateInfo: StateInfo[] = [];
-  for (let i=0; i<Object.keys(statePos).length; i++) {
-    const sname = Object.keys(statePos)[i];
+  Object.keys(statePos).forEach((sname) => {
     const transitions = state.machineDict[sname];
 
     let toStates: StateInfo[] = []
+    //other states that sname points to.
     Object.entries(transitions).filter(([, tval]) => tval.newState !== sname).forEach(([tinput, tval]) => {
       if (tinput === " ")
         tinput = "_";
+
+      //This fixes an issue I had for a while: in palindrome, q7 is pointed to,
+      //but not formally declared with steps in the program. I decided it should
+      //still be drawn, since arrows will point to it, even if it points nowhere.
+      if (tval.newState === "v")
+        return;
 
       const otherPointBacks = Object.values(state.machineDict[tval.newState]).filter(smd => smd.newState === sname);
       let backTo = [];
@@ -117,12 +126,24 @@ function getStateInfo(statePos: Record<string, Pos>, state: TapeState): StateInf
       });
     });
 
+    //if sname points back to itself.
+    Object.entries(transitions).filter(([, tval]) => tval.newState === sname).forEach(([tinput, tval]) => {
+      if (tinput === " ")
+        tinput = "_";
+
+      toStates.push({
+        name:tval.newState,
+        pos:statePos[tval.newState],
+        to:[],
+      });
+    });
+
     stateInfo.push({
       name:sname,
       pos:statePos[sname],
       to:toStates,
     });
-  }
+  });
 
   return stateInfo;
 }

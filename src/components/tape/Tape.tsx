@@ -212,6 +212,7 @@ function loadCodeIntoStateMachine(state: TapeState): [machineDict: MachineDict, 
   let stateMachineDict: Record<string, Record<string, StateMachine>> = {};
   let startState: string = "";
 
+  let newStateSet: Set<string> = new Set();
   for (let i=0; i<lines.length; i++) {
     const match = lines[i].match(instructionPat);
     if (!match)
@@ -223,6 +224,7 @@ function loadCodeIntoStateMachine(state: TapeState): [machineDict: MachineDict, 
     if (cursymbol === "_")
       cursymbol = " ";
 
+    newStateSet.add(newstate);
     (stateMachineDict[curstate] ??= {})[cursymbol] = {
       instructionline: i+1,
       newSymbol: newsymbol,
@@ -230,6 +232,19 @@ function loadCodeIntoStateMachine(state: TapeState): [machineDict: MachineDict, 
       direction: direction,
     };
   }
+
+  //check for if a state is pointed to that is never declared. Add it as empty
+  //with "v" for all info.
+  newStateSet.forEach((ns) => {
+    if (!(ns in stateMachineDict)) {
+      (stateMachineDict[ns] ??= {})["v"] = {
+        instructionline: 0,
+        newSymbol: "v",
+        newState: "v",
+        direction: "v",
+      };
+    }
+  });
 
   return [stateMachineDict, startState];
 }
