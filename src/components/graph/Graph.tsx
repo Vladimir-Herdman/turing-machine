@@ -100,7 +100,7 @@ function drawArrows(draw: Svg, statePos: Record<string, Pos>, state: TapeState) 
         console.log();
 
       to = shortenByRadius(from, to, tname.match(haltPat) ? 70 : 60);
-      let curvePoint = {x:(from.x + to.x)/2, y:(from.y + to.y)/2};
+      let curvePoint = getMidPoint(from, to);
       if (statesPointAtEachOther(stateInfo, fname, tname))
         curvePoint = getCurvePoint(from, to, 125);
 
@@ -167,12 +167,19 @@ function getStateInfo(statePos: Record<string, Pos>, state: TapeState): StateInf
   return stateInfo;
 }
 
+function getMidPoint(from: Pos, to: Pos): Pos {
+  return {
+    x:(from.x + to.x)/2,
+    y:(from.y + to.y)/2,
+  };
+}
+
 function getCurvePoint(from: Pos, to: Pos, offset: number) {
   const [dx, dy] = [to.x - from.x, to.y - from.y];
   const len = Math.hypot(dx, dy) || 1;
 
   const [perpx, perpy] = [(-(to.y - from.y))/len, (to.x - from.x)/len];
-  const [mx, my] = [(to.x + from.x)/2, (to.y + from.y)/2];
+  const {x:mx, y:my} = getMidPoint(from, to);
 
   return {
     x:mx + perpx * offset,
@@ -180,8 +187,14 @@ function getCurvePoint(from: Pos, to: Pos, offset: number) {
   };
 }
 
-function statesPointAtEachOther(stateInfo: StateInfo[], s1: string, s2: string): boolean {
-  return true;
+function statesPointAtEachOther(stateInfo: StateInfo[], s1name: string, s2name: string): boolean {
+  const s1 = stateInfo.find(s => s.name === s1name);
+  const s2 = stateInfo.find(s => s.name === s2name);
+  if (s1 === undefined || s2 === undefined)
+    return false;
+  if (s1.to.find(s => s.name === s2name) && s2.to.find(s => s.name === s1name))
+    return true
+  return false;
 }
 
 //arrows point to center of state circle, so shorten some so the arrow head is
