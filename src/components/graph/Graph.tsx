@@ -92,19 +92,17 @@ function drawArrows(draw: Svg, statePos: Record<string, Pos>, state: TapeState) 
 
   //draw arrows from each state to its to states.
   stateInfo.forEach(({name:fname, pos:from, to:fto}) => {
-    fto.forEach(({name:tname, pos:to, to:tto}) => {
-      if (fname === tname) //points back to self.
-        return;
-
-      if (tto.length > 0) //points back to fname.
-        console.log();
-
+    fto.forEach(({name:tname, pos:to}) => {
       to = shortenByRadius(from, to, tname.match(haltPat) ? 70 : 60);
       let curvePoint = getMidPoint(from, to);
       if (statesPointAtEachOther(stateInfo, fname, tname))
         curvePoint = getCurvePoint(from, to, 125);
+      let arrowPath = `M ${from.x} ${from.y} Q ${curvePoint.x} ${curvePoint.y}, ${to.x} ${to.y}`;
 
-      const p = draw.path(`M ${from.x} ${from.y} Q ${curvePoint.x} ${curvePoint.y}, ${to.x} ${to.y}`)
+      if (fname === tname) //points back to self.
+          return; //arrowPath = ``;
+
+      const p = draw.path(arrowPath)
         .fill("none")
         .stroke({ color:"#000", width:4 })
         .marker("end", 8, 8, (add) => {
