@@ -87,12 +87,31 @@ type StateInfo = {
   to: StateInfo[];
 }
 function drawArrows(draw: Svg, statePos: Record<string, Pos>, state: TapeState) {
-  //build data structure of states and states they point to, and info for each one they point to.
+  //build data structure of states and states they point to.
   let stateInfo: StateInfo[] = getStateInfo(statePos, state);
-  //console.log(stateInfo);
-  // stateInfo.forEach((s) => {
-  //   console.log(s);
-  // });
+
+  //draw arrows from each state to its to states.
+  stateInfo.forEach(({name:fname, pos:from, to:fto}) => {
+    fto.forEach(({name:tname, pos:to, to:tto}) => {
+      if (fname === tname) //points back to self.
+        return;
+
+      if (tto.length > 0) //points back to fname.
+        console.log();
+
+      to = shortenByRadius(from, to, tname.match(haltPat) ? 70 : 60);
+      let curvePoint = {x:(from.x + to.x)/2, y:(from.y + to.y)/2};
+      if (statesPointAtEachOther(stateInfo, fname, tname))
+        curvePoint = getCurvePoint(from, to, 125);
+
+      const p = draw.path(`M ${from.x} ${from.y} Q ${curvePoint.x} ${curvePoint.y}, ${to.x} ${to.y}`)
+        .fill("none")
+        .stroke({ color:"#000", width:4 })
+        .marker("end", 8, 8, (add) => {
+          add.path("M 0 0 L 8 4 L 0 8").fill("none").stroke({ color:"#000", width:1 });
+        });
+    });
+  });
 }
 
 function getStateInfo(statePos: Record<string, Pos>, state: TapeState): StateInfo[] {
@@ -146,6 +165,23 @@ function getStateInfo(statePos: Record<string, Pos>, state: TapeState): StateInf
   });
 
   return stateInfo;
+}
+
+function getCurvePoint(from: Pos, to: Pos, offset: number) {
+  const [dx, dy] = [to.x - from.x, to.y - from.y];
+  const len = Math.hypot(dx, dy) || 1;
+
+  const [perpx, perpy] = [(-(to.y - from.y))/len, (to.x - from.x)/len];
+  const [mx, my] = [(to.x + from.x)/2, (to.y + from.y)/2];
+
+  return {
+    x:mx + perpx * offset,
+    y:my + perpy * offset,
+  };
+}
+
+function statesPointAtEachOther(stateInfo: StateInfo[], s1: string, s2: string): boolean {
+  return true;
 }
 
 //arrows point to center of state circle, so shorten some so the arrow head is
