@@ -75,7 +75,7 @@ function setupSvgDrawing(state: TapeState, copyFunc: (svg: Svg) => void): [draw:
   draw.rect(1000, 1000).fill("#fff");
 
   const center = 500;
-  const radius = 300;
+  const radius = 375;
   const nstates = Object.keys(state.machineDict).length;
 
   return [draw, center, radius, nstates]
@@ -110,13 +110,26 @@ function drawArrows(draw: Svg, statePos: Record<string, Pos>, state: TapeState) 
         .marker("end", 8, 8, (add) => {
           add.path("M 0 0 L 8 4 L 0 8").fill("none").stroke({ color:"#000", width:1 });
         });
+
+      const textPoint = getCurvePoint(p.pointAt(p.length()*(2/8)), p.pointAt(p.length()*(3/8)), 35);
+      const toStates = Object.entries(state.machineDict[fname]).filter(d => d[1].newState === tname, []);
+      let text = "";
+      toStates.forEach(([sinput, snext]) => {
+        if (sinput === " ")
+          sinput = "_";
+        text += `${sinput}/${snext.newSymbol},${snext.direction.toUpperCase()}\n`;
+      });
+      draw.text(text)
+        .attr({ fill:"#444" })
+        .font({ family:"Times New Roman", size:30 })
+        .center(textPoint.x, textPoint.y);
     });
   });
 }
 
 function getStateInfo(statePos: Record<string, Pos>, state: TapeState): StateInfo[] {
   let stateInfo: StateInfo[] = [];
-  Object.keys(statePos).forEach((sname) => {
+  Object.keys(statePos).forEach(sname => {
     const transitions = state.machineDict[sname];
 
     let toStates: StateInfo[] = []
